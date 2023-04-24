@@ -44,9 +44,7 @@
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-static const uint8_t Spectral_Adress = 0x39 << 0; // Base adress of the color sensor
-static const uint8_t CH1_L_DAT = 0x66; //lower Byte of chanel one
-static const uint8_t CH1_H_DAT = 0x67; //higher Byte of chanel one
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -70,10 +68,6 @@ static void MX_I2C1_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	HAL_StatusTypeDef ret;
-		uint8_t buf[12];
-		int16_t val;
-		float test;
 
   /* USER CODE END 1 */
 
