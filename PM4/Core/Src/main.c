@@ -39,7 +39,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
- I2C_HandleTypeDef hi2c1;
+I2C_HandleTypeDef hi2c1;
 
 UART_HandleTypeDef huart2;
 
@@ -278,7 +278,49 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+static void SPECTRAL_Init(void){
+	uint8_t AS_addres = 0x39;
+	uint8_t buffer[10] = {0b00011000};
+	// ENABLE REGISTEERS
+	HAL_I2C_Mem_Write(&hi2c1,AS_addres,0x80,I2C_MEMADD_SIZE_8BIT,buffer,1,HAL_MAX_DELAY);
+	/* reserved = 0
+	 * Fliker detection enable = 0 -> disabeled
+	 * SMUX enable = 1 -> enabled Todo: (noch nicht kalr ob nötig)
+	 * wait between mesurements enable = 1 -> enabled
+	 * reserved = 0
+	 * Spectral mesurement enable = 0 -> disabled  (needs to be enabled at the end of configuration
+	 * power on = 0 -> internal clocc of sensor disabled
+	 */
+	// CONFIG REGISTER
+	buffer[0] = 0b00001000;
+	HAL_I2C_Mem_Write(&hi2c1,AS_addres,0x70,I2C_MEMADD_SIZE_8BIT,buffer,1,HAL_MAX_DELAY);
+	/*reserved 7:4 = 0000
+	 * LED control = 1 -> use internal led
+	 * sync signal apied to output pin INT = 0 Todo: noch icht klar ob richtig
+	 * mesurment mode 1:0 =  00 normal mesurment mode
+	 */
+	//GPIO REGISTER
+	buffer[0] = 0b00000000;
+	HAL_I2C_Mem_Write(&hi2c1,AS_addres,0x73,I2C_MEMADD_SIZE_8BIT,buffer,1,HAL_MAX_DELAY);
+	/*
+	 * reserved 7:2 = 000000
+	 * diod connected to pin GPIO = 0 we use the internal diod Todo: Check electrical diagram how the
+	 * 																	the diod is internaly connected
+	 * diod connected to pin INT = 0 we use internal diod
+	 */
+	//GPIO 2 REGISTER
+	buffer[0] = 0b00000000;
+	HAL_I2C_Mem_Write(&hi2c1,AS_addres,0xBE,I2C_MEMADD_SIZE_8BIT,buffer,1,HAL_MAX_DELAY);
+	/*
+	 * We don't use the GPIO of the sensor yet
+	 */
+	//buffer[0] = 0	;
+	//HAL_I2C_Mem_Write(&hi2c1,AS_addres,0xBE,I2C_MEMADD_SIZE_8BIT,buffer,1,HAL_MAX_DELAY);
 
+
+
+
+}
 /* USER CODE END 4 */
 
 /**

@@ -1146,3 +1146,21 @@
 2023-04-24 16:56:02,672 [INFO] OpenFileManager:323 - Restore cursor
 2023-04-24 16:56:57,052 [INFO] I2cTimingTraitement:325 - 0x2000090E
 2023-04-24 16:59:23,257 [INFO] I2cTimingTraitement:325 - 0x2000090E
+2023-04-25 09:00:32,684 [INFO] Activator:177 - 
+
+
+2023-04-25 09:00:32,687 [INFO] Activator:178 - !SESSION log4j initialized
+2023-04-25 09:00:39,858 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 
+2023-04-25 09:00:43,512 [ERROR] AnalyticsContext:980 - The ST intranet updater server is unknown: mcucrossselector.codex.cro.st.com
+2023-04-25 09:58:06,025 [INFO] Activator:177 - 
+
+
+2023-04-25 09:58:06,028 [INFO] Activator:178 - !SESSION log4j initialized
+2023-04-25 09:58:12,390 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 
+2023-04-25 09:58:15,796 [ERROR] AnalyticsContext:980 - The ST intranet updater server is unknown: mcucrossselector.codex.cro.st.com
+2023-04-25 10:52:54,692 [INFO] Activator:177 - 
+
+
+2023-04-25 10:52:54,697 [INFO] Activator:178 - !SESSION log4j initialized
+2023-04-25 10:53:01,357 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 
+2023-04-25 10:53:04,773 [ERROR] AnalyticsContext:980 - The ST intranet updater server is unknown: mcucrossselector.codex.cro.st.com
