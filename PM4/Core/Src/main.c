@@ -314,9 +314,31 @@ static void SPECTRAL_Init(void){
 	/*
 	 * We don't use the GPIO of the sensor yet
 	 */
-	//buffer[0] = 0	;
-	//HAL_I2C_Mem_Write(&hi2c1,AS_addres,0xBE,I2C_MEMADD_SIZE_8BIT,buffer,1,HAL_MAX_DELAY);
 
+	//LED Register
+	buffer[0] = 0b00000100;
+	HAL_I2C_Mem_Write(&hi2c1,AS_addres,0x74,I2C_MEMADD_SIZE_8BIT,buffer,1,HAL_MAX_DELAY);
+
+	//Interupt Register
+	buffer[0] = 0b00000000;
+	HAL_I2C_Mem_Write(&hi2c1,AS_addres,0xF9,I2C_MEMADD_SIZE_8BIT,buffer,1,HAL_MAX_DELAY);
+
+	//Controll register
+	buffer[0] = 0b00000000;
+	HAL_I2C_Mem_Write(&hi2c1,AS_addres,0xFA,I2C_MEMADD_SIZE_8BIT,buffer,1,HAL_MAX_DELAY);
+
+	//Integration s zeit
+	buffer[0] = 0b00000000;
+	HAL_I2C_Mem_Write(&hi2c1,AS_addres,0x81,I2C_MEMADD_SIZE_8BIT,buffer,1,HAL_MAX_DELAY);
+
+	//Integrationszeit
+	buffer[0] = 0b00000000;
+	HAL_I2C_Mem_Write(&hi2c1,AS_addres,0xCA,I2C_MEMADD_SIZE_8BIT,buffer,1,HAL_MAX_DELAY);
+	HAL_I2C_Mem_Write(&hi2c1,AS_addres,0xCB,I2C_MEMADD_SIZE_8BIT,buffer,1,HAL_MAX_DELAY);
+
+	//Waittime (so woie ich verstanden habe zykluszeit)
+	buffer[0] = 0b00010000; //13.9ms sollte genügend lange sien
+	HAL_I2C_Mem_Write(&hi2c1,AS_addres,0x83,I2C_MEMADD_SIZE_8BIT,buffer,1,HAL_MAX_DELAY);
 
 
 
