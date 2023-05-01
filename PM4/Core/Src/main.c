@@ -39,7 +39,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-I2C_HandleTypeDef hi2c1;
+ I2C_HandleTypeDef hi2c1;
 
 UART_HandleTypeDef huart2;
 
@@ -72,7 +72,7 @@ int main(void)
   /* USER CODE BEGIN 1 */
 	HAL_StatusTypeDef ret;
 		uint8_t buf[12];
-		int16_t val;
+		int16_t val[1] = {0};
 		float test;
 
   /* USER CODE END 1 */
@@ -98,7 +98,8 @@ int main(void)
   MX_USART2_UART_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-
+  SPECTRAL_Init();
+  Spectral_check();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -107,8 +108,14 @@ int main(void)
   {
     /* USER CODE END WHILE */
 
+
     /* USER CODE BEGIN 3 */
-  }
+	  val[0] = measrument();
+	  strcpy((char*)buf,"Hello\n");
+	  HAL_UART_Transmit(&huart2, buf,strlen((char*)buf),HAL_MAX_DELAY);
+	  HAL_Delay(500);}
+
+  	  printf(val);
   /* USER CODE END 3 */
 }
 
@@ -268,9 +275,9 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PB0 PB1 PB3 PB4
-                           PB5 PB6 */
+                           PB5 PB8 */
   GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_3|GPIO_PIN_4
-                          |GPIO_PIN_5|GPIO_PIN_6;
+                          |GPIO_PIN_5|GPIO_PIN_8;
   GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
@@ -278,8 +285,19 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-static void SPECTRAL_Init(void){
-	uint8_t AS_addres = 0x39;
+void Spectral_check(void){
+	uint8_t rec_dat[1] = {0};
+	HAL_I2C_Mem_Read(&hi2c1,(0x39<<1),0x92,I2C_MEMADD_SIZE_8BIT,rec_dat,1,HAL_MAX_DELAY);
+
+	if(rec_dat[0] == 0x24){
+		return;
+	}
+
+	return 1;
+}
+
+void SPECTRAL_Init(void){
+	uint8_t AS_addres = (0x39<<1);
 	uint8_t buffer[10] = {0b00011000};
 	// ENABLE REGISTEERS
 	HAL_I2C_Mem_Write(&hi2c1,AS_addres,0x80,I2C_MEMADD_SIZE_8BIT,buffer,1,HAL_MAX_DELAY);
@@ -340,9 +358,46 @@ static void SPECTRAL_Init(void){
 	buffer[0] = 0b00010000; //13.9ms sollte genügend lange sien
 	HAL_I2C_Mem_Write(&hi2c1,AS_addres,0x83,I2C_MEMADD_SIZE_8BIT,buffer,1,HAL_MAX_DELAY);
 
+	//Enable chip last register entry in this function
+	buffer[0] = 0b00011001;
+	/* reserved = 0
+	* Fliker detection enable = 0 -> disabeled
+	* SMUX enable = 1 -> enabled Todo: (noch nicht kalr ob nötig)
+	* wait between mesurements enable = 1 -> enabled
+	* reserved = 0
+	* Spectral mesurement enable = 1 -> enabled  (needs to be enabled at the end of configuration
+	* power on = 1 -> internal clocc of sensor enabled
+	*/
+	HAL_I2C_Mem_Write(&hi2c1,AS_addres,0x80,I2C_MEMADD_SIZE_8BIT,buffer,1,HAL_MAX_DELAY);
 
-
+	return;
 }
+
+void measrument(){
+	uint16_t sens_val = 0x0;
+	uint8_t buf[2] = {0, 0};
+	uint8_t startbit = 0b00011011;
+	uint8_t stopbit =  0b00011001;
+	/* reserved = 0
+	* Fliker detection enable = 0 -> disabeled
+	* SMUX enable = 1 -> enabled Todo: (noch nicht kalr ob nötig)
+	* wait between mesurements enable = 1 -> enabled
+	* reserved = 0
+	* Spectral mesurement enable = 1 -> enabled  (needs to be enabled at the end of configuration
+	* power on = 1 -> internal clocc of sensor enabled
+	*/
+
+	HAL_I2C_Mem_Write(&hi2c1,(0x39<<1),0x80,I2C_MEMADD_SIZE_8BIT,startbit ,1,HAL_MAX_DELAY);
+	HAL_Delay(500);
+	HAL_I2C_Mem_Read(&hi2c1,(0x39<<1),0x6A,I2C_MEMADD_SIZE_8BIT,buf ,2,HAL_MAX_DELAY);
+	sens_val = buf[1];
+	sens_val = sens_val<<8;
+	sens_val |= buf[0];
+	HAL_I2C_Mem_Write(&hi2c1,(0x39<<1),0x80,I2C_MEMADD_SIZE_8BIT,stopbit,1,HAL_MAX_DELAY);
+
+	return sens_val;
+}
+
 /* USER CODE END 4 */
 
 /**
