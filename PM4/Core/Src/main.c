@@ -111,7 +111,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 	  val[0] = measrument();
-	  strcpy((char*)buf,"Hello\n");
+	  strcpy((char*)buf,"Hello LUca\n");
 	  HAL_UART_Transmit(&huart2, buf,strlen((char*)buf),HAL_MAX_DELAY);
 	  HAL_Delay(500);}
 
