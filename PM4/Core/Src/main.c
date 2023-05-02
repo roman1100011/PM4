@@ -310,7 +310,8 @@ void SPECTRAL_Init(void){
 	 * power on = 0 -> internal clocc of sensor disabled
 	 */
 	// CONFIG REGISTER
-	buffer[0] = 0b00001000;
+	//buffer[0] = 0b00001000;
+	buffer[0] = 0x0;
 	HAL_I2C_Mem_Write(&hi2c1,AS_addres,0x70,I2C_MEMADD_SIZE_8BIT,buffer,1,HAL_MAX_DELAY);
 	/*reserved 7:4 = 0000
 	 * LED control = 1 -> use internal led
@@ -345,18 +346,28 @@ void SPECTRAL_Init(void){
 	buffer[0] = 0b00000000;
 	HAL_I2C_Mem_Write(&hi2c1,AS_addres,0xFA,I2C_MEMADD_SIZE_8BIT,buffer,1,HAL_MAX_DELAY);
 
-	//Integration s zeit
-	buffer[0] = 0b00000000;
+	//Integration s zeit   (ATIME)
+	//buffer[0] = 0b00000000;
+	//HAL_I2C_Mem_Write(&hi2c1,AS_addres,0x81,I2C_MEMADD_SIZE_8BIT,buffer,1,HAL_MAX_DELAY);
+	buffer[0] = 0x64;
 	HAL_I2C_Mem_Write(&hi2c1,AS_addres,0x81,I2C_MEMADD_SIZE_8BIT,buffer,1,HAL_MAX_DELAY);
 
-	//Integrationszeit
-	buffer[0] = 0b00000000;
+	//Integrationszeit     (ASTEP)
+	//buffer[0] = 0b00000000;
+	//HAL_I2C_Mem_Write(&hi2c1,AS_addres,0xCA,I2C_MEMADD_SIZE_8BIT,buffer,1,HAL_MAX_DELAY);
+	//HAL_I2C_Mem_Write(&hi2c1,AS_addres,0xCB,I2C_MEMADD_SIZE_8BIT,buffer,1,HAL_MAX_DELAY);
+	buffer[0] = 0xE7;
 	HAL_I2C_Mem_Write(&hi2c1,AS_addres,0xCA,I2C_MEMADD_SIZE_8BIT,buffer,1,HAL_MAX_DELAY);
+	buffer[0] = 0x03;
 	HAL_I2C_Mem_Write(&hi2c1,AS_addres,0xCB,I2C_MEMADD_SIZE_8BIT,buffer,1,HAL_MAX_DELAY);
 
 	//Waittime (so woie ich verstanden habe zykluszeit)
 	buffer[0] = 0b00010000; //13.9ms sollte genügend lange sien
 	HAL_I2C_Mem_Write(&hi2c1,AS_addres,0x83,I2C_MEMADD_SIZE_8BIT,buffer,1,HAL_MAX_DELAY);
+
+	//spectral Gain
+	buffer[0]= 0x09;
+	HAL_I2C_Mem_Write(&hi2c1,AS_addres,0xAA,I2C_MEMADD_SIZE_8BIT,buffer,1,HAL_MAX_DELAY);
 
 	//Enable chip last register entry in this function
 	buffer[0] = 0b00011001;
@@ -376,8 +387,8 @@ void SPECTRAL_Init(void){
 void measrument(){
 	uint16_t sens_val = 0x0;
 	uint8_t buf[2] = {0, 0};
-	uint8_t startbit = 0b00011011;
-	uint8_t stopbit =  0b00011001;
+	uint8_t startbit[1] = {0b00010011};
+	uint8_t stopbit[1] =  {0b00011001};
 	/* reserved = 0
 	* Fliker detection enable = 0 -> disabeled
 	* SMUX enable = 1 -> enabled Todo: (noch nicht kalr ob nötig)
@@ -389,7 +400,7 @@ void measrument(){
 
 	HAL_I2C_Mem_Write(&hi2c1,(0x39<<1),0x80,I2C_MEMADD_SIZE_8BIT,startbit ,1,HAL_MAX_DELAY);
 	HAL_Delay(500);
-	HAL_I2C_Mem_Read(&hi2c1,(0x39<<1),0x6A,I2C_MEMADD_SIZE_8BIT,buf ,2,HAL_MAX_DELAY);
+	HAL_I2C_Mem_Read(&hi2c1,(0x39<<1),0x80,I2C_MEMADD_SIZE_8BIT,buf ,2,HAL_MAX_DELAY);
 	sens_val = buf[1];
 	sens_val = sens_val<<8;
 	sens_val |= buf[0];
